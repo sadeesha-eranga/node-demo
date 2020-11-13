@@ -6,7 +6,7 @@ log4js.configure({
         dateFile: { type: 'dateFile', filename: 'logs/node-demo.log', keepFileExt: true }
     },
     categories: {
-        default: { appenders: ['out', 'dateFile'], level: 'info' }
+        default: { appenders: ['out', 'dateFile'], level: 'debug' }
     }
 });
 

@@ -11,7 +11,7 @@ function passportConfiguration(passport) {
     passport.use(new Strategy(opts, (jwtPayload, done) => {
         User.findOne({ _id: jwtPayload._id, status: 1 })
             .then((user) => done(null, user))
-            .error((err) => done(err, false));
+            .catch((err) => done(err, false));
     }));
 }
 

@@ -1,0 +1,21 @@
+version: '3.4'
+services:
+  app:
+    container_name: node-demo
+    restart: always
+    build: .
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongo
+    environment:
+      NODE_ENV: 'docker_dev'
+      MONGODB_URI: '${DOCKER_MONGODB_URI}'
+      PORT: '${PORT}'
+      JWT_SECRET: '${JWT_SECRET}'
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    ports:
+      - '27017:27017'
