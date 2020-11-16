@@ -1,4 +1,5 @@
 const passport = require('passport');
+const { StatusCodes } = require('http-status-codes');
 
 module.exports = (req, res, next) => {
     return passport.authenticate('jwt', { session: false }, (error, userDtls) => {
@@ -7,7 +8,7 @@ module.exports = (req, res, next) => {
             next();
         } else {
             const err = new Error('Unauthorized request');
-            err.statusCode = 401;
+            err.code = StatusCodes.UNAUTHORIZED;
             next(err);
         }
     })(req, res, next);

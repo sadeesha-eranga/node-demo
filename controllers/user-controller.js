@@ -1,10 +1,22 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { StatusCodes } = require('http-status-codes');
 
 async function registerUser(req, res, next) {
     try {
         const { username, password, firstName, lastName, email } = req.body;
+        
+        const existsByUserName = await User.countDocuments({username});
+        if (existsByUserName) return res.status(StatusCodes.CONFLICT).json({
+            code: StatusCodes.CONFLICT,
+            message: 'Username already in use!'
+        });
+        const existByEmail = await User.countDocuments({email});
+        if (existByEmail) return res.status(StatusCodes.CONFLICT).json({
+            code: StatusCodes.CONFLICT,
+            message: 'Email already in use!'
+        });
         
         const user = await new User({
             username,
@@ -15,6 +27,7 @@ async function registerUser(req, res, next) {
         }).save();
         
         res.json({
+            code: StatusCodes.CREATED,
             message: 'Successfully registered!',
             user: { ...user._doc, password: undefined }
         });
@@ -28,13 +41,13 @@ async function authenticateUser(req, res, next) {
     try {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
-        if (!user) return res.status(401).json({
-            statusCode: 401,
+        if (!user) return res.status(StatusCodes.UNAUTHORIZED).json({
+            code: StatusCodes.UNAUTHORIZED,
             message: 'Invalid username!'
         });
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(401).json({
-            statusCode: 401,
+        if (!isMatch) return res.status(StatusCodes.UNAUTHORIZED).json({
+            code: StatusCodes.UNAUTHORIZED,
             message: 'Invalid password!'
         });
         
@@ -49,6 +62,7 @@ async function authenticateUser(req, res, next) {
         await user.save();
         
         res.json({
+            code: StatusCodes.OK,
             message: 'Logged in successfully!',
             accessToken: token
         });
@@ -64,6 +78,7 @@ async function logoutUser(req, res, next) {
         user.status = 0;
         user.save();
         res.json({
+            code: StatusCodes.OK,
             message: 'Logged out successfully!'
         });
     } catch (e) {
@@ -75,6 +90,8 @@ async function logoutUser(req, res, next) {
 async function getUserDetails(req, res, next) {
     try {
         res.json({
+            code: StatusCodes.OK,
+            message: 'User details found!',
             user: {
                 ...req._user._doc,
                 password: undefined

@@ -1,9 +1,11 @@
 # node-demo
 NodeJS RESTful API demo
 
-### Run using docker-compose
+## Run using docker-compose
 docker-compose up
 
-### Run using npm
+## Run using npm
+npm install
+
 npm start
 
